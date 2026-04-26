@@ -21,6 +21,64 @@
     body { background: var(--bg); color: var(--white); font-family: var(--font-zh); overflow-x: hidden; }
     section { display: block; }
 
+    /* ── MOBILE SCROLL SNAP ── */
+    @media (max-width: 768px) {
+      html {
+        scroll-snap-type: y mandatory;
+        overflow-y: scroll;
+      }
+      #intro, .scene, #polaroid-section {
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+      }
+    }
+
+    /* ── SWIPE HINT (mobile only) ── */
+    #swipe-hint {
+      display: none;
+    }
+    @media (max-width: 768px) {
+      #swipe-hint {
+        display: flex;
+        position: fixed;
+        bottom: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        z-index: 300;
+        pointer-events: none;
+        opacity: 1;
+        transition: opacity 0.6s ease;
+      }
+      #swipe-hint.hidden { opacity: 0; }
+      .swipe-hint-arrow {
+        width: 20px; height: 20px;
+        border-right: 1.5px solid rgba(212,149,106,0.7);
+        border-bottom: 1.5px solid rgba(212,149,106,0.7);
+        transform: rotate(45deg);
+        animation: swipeBounce 1.4s ease-in-out infinite;
+      }
+      .swipe-hint-arrow:nth-child(2) { animation-delay: 0.15s; opacity: 0.5; }
+      .swipe-hint-label {
+        font-size: 9px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: rgba(212,149,106,0.6);
+        margin-top: 4px;
+        animation: swipeFade 1.4s ease-in-out infinite;
+      }
+      @keyframes swipeBounce {
+        0%, 100% { transform: rotate(45deg) translateY(0); opacity: 0.8; }
+        50% { transform: rotate(45deg) translateY(5px); opacity: 1; }
+      }
+      @keyframes swipeFade {
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 1; }
+      }
+    }
+
     /* ── PROGRESS ── */
     #progress-bar {
       position: fixed; top: 0; left: 0;
@@ -113,6 +171,35 @@
         rgba(18,16,14,0.5) 40%,
         rgba(18,16,14,0.1) 100%
       );
+    }
+
+    /* ── MOBILE: picture source switching ── */
+    /* Desktop shows <img> inside <picture> as cover, mobile source uses contain */
+    @media (max-width: 768px) {
+      .scene {
+        height: 100svh;
+        display: grid;
+        grid-template-rows: 1fr auto;
+        align-items: stretch;
+      }
+      .scene-img {
+        position: absolute; inset: 0;
+      }
+      /* Mobile: photo sits in top portion, text overlays bottom */
+      .scene-img picture {
+        display: block;
+        width: 100%; height: 100%;
+      }
+      .scene-img img {
+        width: 100%; height: 100%;
+        object-fit: cover;
+        object-position: center center;
+      }
+      /* When a mobile-specific source is loaded (9:16), switch to contain */
+      .scene-img img.is-portrait {
+        object-fit: contain;
+        background: #111;
+      }
     }
 
     .scene-body {
@@ -272,7 +359,6 @@
 
     /* ── RWD ── */
     @media (max-width: 768px) {
-      .scene { height: 100svh; }
       .scene.reverse .scene-body { margin-left: 0; align-items: flex-start; text-align: left; }
       .scene.reverse .scene-divider { transform-origin: left; margin-left: 0; }
       .scene-body { padding: 40px 28px 56px; max-width: 100%; }
@@ -353,6 +439,13 @@
 </div>
 <audio id="bg-audio" loop><source src="./music.mp3" type="audio/mpeg"></audio>
 
+<!-- SWIPE HINT — mobile only, auto-hides after first swipe -->
+<div id="swipe-hint">
+  <div class="swipe-hint-arrow"></div>
+  <div class="swipe-hint-arrow"></div>
+  <span class="swipe-hint-label">Swipe</span>
+</div>
+
 <nav id="chapter-dots">
   <div class="dot active" onclick="goTo(0)"></div>
   <div class="dot" onclick="goTo(1)"></div>
@@ -380,7 +473,12 @@
 
 <!-- SCENE 1 -->
 <section class="scene" data-idx="1">
-  <div class="scene-img"><img src="./images/01.jpg" alt="童年陰影"/></div>
+  <div class="scene-img">
+    <picture>
+      <source media="(max-width: 768px)" srcset="./images/01-mobile.jpg">
+      <img src="./images/01.jpg" alt="童年陰影"/>
+    </picture>
+  </div>
   <div class="scene-body">
     <p class="scene-chapter">01 — The Shadow</p>
     <div class="scene-divider"></div>
@@ -392,7 +490,12 @@
 
 <!-- SCENE 2 -->
 <section class="scene reverse" data-idx="2">
-  <div class="scene-img"><img src="./images/02.jpg" alt="初次相遇"/></div>
+  <div class="scene-img">
+    <picture>
+      <source media="(max-width: 768px)" srcset="./images/02-mobile.jpg">
+      <img src="./images/02.jpg" alt="初次相遇"/>
+    </picture>
+  </div>
   <div class="scene-body">
     <p class="scene-chapter">02 — The Arrival</p>
     <div class="scene-divider"></div>
@@ -404,7 +507,12 @@
 
 <!-- SCENE 3 -->
 <section class="scene" data-idx="3">
-  <div class="scene-img"><img src="./images/03.jpg" alt="陌生與距離"/></div>
+  <div class="scene-img">
+    <picture>
+      <source media="(max-width: 768px)" srcset="./images/03-mobile.jpg">
+      <img src="./images/03.jpg" alt="陌生與距離"/>
+    </picture>
+  </div>
   <div class="scene-body">
     <p class="scene-chapter">03 — The Distance</p>
     <div class="scene-divider"></div>
@@ -416,7 +524,12 @@
 
 <!-- SCENE 4 -->
 <section class="scene reverse" data-idx="4">
-  <div class="scene-img"><img src="./images/04.jpg" alt="疫情封城"/></div>
+  <div class="scene-img">
+    <picture>
+      <source media="(max-width: 768px)" srcset="./images/04-mobile.jpg">
+      <img src="./images/04.jpg" alt="疫情封城"/>
+    </picture>
+  </div>
   <div class="scene-body">
     <p class="scene-chapter">04 — Lockdown</p>
     <div class="scene-divider"></div>
@@ -428,7 +541,12 @@
 
 <!-- SCENE 5 -->
 <section class="scene" data-idx="5">
-  <div class="scene-img"><img src="./images/05.jpg" alt="待業的重量"/></div>
+  <div class="scene-img">
+    <picture>
+      <source media="(max-width: 768px)" srcset="./images/05-mobile.jpg">
+      <img src="./images/05.jpg" alt="待業的重量"/>
+    </picture>
+  </div>
   <div class="scene-body">
     <p class="scene-chapter">05 — The Weight of Waiting</p>
     <div class="scene-divider"></div>
@@ -440,7 +558,12 @@
 
 <!-- SCENE 6 -->
 <section class="scene reverse" data-idx="6">
-  <div class="scene-img"><img src="./images/06.jpg" alt="日久生情"/></div>
+  <div class="scene-img">
+    <picture>
+      <source media="(max-width: 768px)" srcset="./images/06-mobile.jpg">
+      <img src="./images/06.jpg" alt="日久生情"/>
+    </picture>
+  </div>
   <div class="scene-body">
     <p class="scene-chapter">06 — The Turn</p>
     <div class="scene-divider"></div>
@@ -452,7 +575,12 @@
 
 <!-- SCENE 7 -->
 <section class="scene" data-idx="7">
-  <div class="scene-img"><img src="./images/07.jpg" alt="日常"/></div>
+  <div class="scene-img">
+    <picture>
+      <source media="(max-width: 768px)" srcset="./images/07-mobile.jpg">
+      <img src="./images/07.jpg" alt="日常"/>
+    </picture>
+  </div>
   <div class="scene-body">
     <p class="scene-chapter">07 — The Shift</p>
     <div class="scene-divider"></div>
@@ -464,7 +592,12 @@
 
 <!-- SCENE 8 -->
 <section class="scene reverse" data-idx="8">
-  <div class="scene-img"><img src="./images/08.jpg" alt="直升機貓爸"/></div>
+  <div class="scene-img">
+    <picture>
+      <source media="(max-width: 768px)" srcset="./images/08-mobile.jpg">
+      <img src="./images/08.jpg" alt="直升機貓爸"/>
+    </picture>
+  </div>
   <div class="scene-body">
     <p class="scene-chapter">08 — Helicopter Cat Dad</p>
     <div class="scene-divider"></div>
@@ -530,6 +663,18 @@
   }
   setHeights();
   window.addEventListener('resize', setHeights);
+
+  // ── SWIPE HINT — hide after first scroll on mobile ──
+  const swipeHint = document.getElementById('swipe-hint');
+  let swipeHintDismissed = false;
+  function dismissSwipeHint() {
+    if (swipeHintDismissed) return;
+    swipeHintDismissed = true;
+    swipeHint.classList.add('hidden');
+    setTimeout(() => { swipeHint.style.display = 'none'; }, 700);
+  }
+  window.addEventListener('scroll', dismissSwipeHint, { once: true });
+  window.addEventListener('touchmove', dismissSwipeHint, { once: true, passive: true });
 
   window.addEventListener('scroll', () => {
     const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
