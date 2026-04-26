@@ -45,7 +45,9 @@
     #chapter-dots {
       position: fixed; right: 24px; top: 50%; transform: translateY(-50%);
       display: flex; flex-direction: column; gap: 10px; z-index: 200;
+      pointer-events: none;
     }
+    #chapter-dots .dot { pointer-events: all; }
     .dot {
       width: 5px; height: 5px; border-radius: 50%;
       background: rgba(242,240,235,0.2); cursor: pointer;
@@ -58,6 +60,7 @@
       height: 100vh; display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       text-align: center; position: relative; padding: 40px;
+      z-index: 1;
     }
     #intro::before {
       content: ''; position: absolute; inset: 0;
@@ -71,8 +74,8 @@
     }
     .intro-title {
       font-family: var(--font-display);
-      font-size: clamp(72px, 14vw, 160px);
-      line-height: 0.95; color: var(--white);
+      font-size: clamp(96px, 18vw, 210px);
+      line-height: 0.92; color: var(--white);
       opacity: 0; animation: fadeUp 1s 0.7s forwards;
     }
     .intro-title-zh {
@@ -81,18 +84,7 @@
       color: var(--gray); margin-top: 20px; letter-spacing: 10px;
       opacity: 0; animation: fadeUp 1s 1s forwards;
     }
-    .intro-scroll {
-      position: absolute; bottom: 36px;
-      display: flex; flex-direction: column; align-items: center; gap: 8px;
-      font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
-      color: rgba(242,240,235,0.25);
-      opacity: 0; animation: fadeUp 1s 1.5s forwards;
-    }
-    .intro-scroll::after {
-      content: ''; width: 1px; height: 36px;
-      background: linear-gradient(to bottom, rgba(242,240,235,0.25), transparent);
-      animation: pulse 2s infinite;
-    }
+    .intro-scroll { display: none; }
     .torn svg { width: 100%; height: 50px; display: block; }
 
     /* ── SCENES ── */
@@ -262,11 +254,7 @@
     .intro-title {
       position: relative;
     }
-    .intro-title .char {
-      display: inline-block;
-      animation: charFloat 3s ease-in-out infinite;
-      animation-delay: calc(var(--i) * 0.15s);
-    }
+
     @keyframes charFloat {
       0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 1; }
       25% { transform: translateY(-12px) rotate(-1.5deg); }
@@ -279,29 +267,14 @@
       display: block;
       letter-spacing: 4px;
     }
-    /* shimmer on outline text */
     .intro-title-outline {
-      background: linear-gradient(
-        90deg,
-        transparent 0%,
-        rgba(212,149,106,0.6) 40%,
-        var(--white) 50%,
-        rgba(212,149,106,0.6) 60%,
-        transparent 100%
-      );
-      background-size: 200% auto;
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: shimmer 4s linear infinite, fadeUp 1s 0.7s both;
+      font-family: var(--font-display);
+      font-size: clamp(72px, 14vw, 160px);
+      line-height: 0.95;
+      display: block;
+      letter-spacing: 4px;
+      color: var(--white);
     }
-    @keyframes shimmer {
-      0% { background-position: 200% center; }
-      100% { background-position: -200% center; }
-    }
-    /* subtle pulse on & Me chars */
-    @keyframes charFloat {
-      0%, 100% { transform: translateY(0px); opacity: 1; }
       50% { transform: translateY(-8px); opacity: 0.85; }
     }
 
@@ -326,6 +299,7 @@
       position: relative;
       width: 320px;
       height: 420px;
+      margin: 0 auto;
     }
     .polaroid-card {
       position: absolute;
@@ -399,6 +373,50 @@
       .polaroid-stage { width: 260px; height: 360px; }
       .polaroid-card { width: 200px; margin-left: -100px; margin-top: -130px; }
     }
+
+    /* ── START BUTTON ── */
+    .start-btn {
+      position: relative;
+      z-index: 10;
+      margin-top: 48px;
+      display: flex; align-items: center; gap: 14px;
+      background: transparent;
+      border: 1px solid rgba(212,149,106,0.5);
+      color: var(--white);
+      padding: 14px 32px;
+      cursor: pointer;
+      border-radius: 100px;
+      font-family: var(--font-zh);
+      font-size: 13px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      opacity: 0;
+      animation: fadeUp 1s 1.2s forwards;
+      transition: background 0.3s, border-color 0.3s, transform 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .start-btn::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at center, rgba(212,149,106,0.15), transparent 70%);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .start-btn:hover { border-color: var(--cat-orange); transform: scale(1.04); }
+    .start-btn:hover::before { opacity: 1; }
+    .start-btn:active { transform: scale(0.98); }
+    .start-btn-icon {
+      font-size: 11px;
+      color: var(--cat-orange);
+      animation: btnPulse 2s ease-in-out infinite;
+    }
+    .start-btn-label { color: rgba(242,240,235,0.85); }
+    @keyframes btnPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.3); }
+    }
+    /* remove old scroll indicator */
+    .intro-scroll { display: none; }
   </style>
 </head>
 <body>
@@ -425,18 +443,12 @@
 <!-- INTRO -->
 <section id="intro" data-idx="0">
   <p class="intro-eyebrow">A story about a cat & a man who didn't want one</p>
-  <div class="intro-title" style="opacity:0;animation:fadeUp 1s 0.7s forwards;">
-    <div style="position:relative;">
-      <span class="intro-title-outline" style="opacity:1;animation:none;">DiGua</span>
-    </div>
-    <div style="position:relative;margin-top:-8px;">
-      <span class="char" style="font-family:var(--font-display);font-size:clamp(72px,14vw,160px);color:var(--white);--i:0">& </span>
-      <span class="char" style="font-family:var(--font-display);font-size:clamp(72px,14vw,160px);color:var(--cat-orange);--i:1">M</span>
-      <span class="char" style="font-family:var(--font-display);font-size:clamp(72px,14vw,160px);color:var(--white);--i:2">e</span>
-    </div>
-  </div>
+  <h1 class="intro-title">DiGua<br>& Me</h1>
   <p class="intro-title-zh">我 與 地 瓜</p>
-  <div class="intro-scroll">Scroll</div>
+  <button class="start-btn" id="start-btn" onclick="startStory()">
+    <span class="start-btn-icon">▶</span>
+    <span class="start-btn-label">Begin the story</span>
+  </button>
 </section>
 
 
@@ -550,7 +562,37 @@
 </section>
 
 
-<script>
+<script>  // ── GLOBALS (must be at top for onclick handlers) ──
+  const audio = document.getElementById('bg-audio');
+  let playing = false;
+
+  function startStory() {
+    const firstScene = document.querySelector('.scene');
+    if (firstScene) firstScene.scrollIntoView({ behavior: 'smooth' });
+    if (!playing) {
+      audio.volume = 0.6;
+      audio.play()
+        .then(() => {
+          document.getElementById('audio-toggle').textContent = '‖';
+          playing = true;
+        })
+        .catch(() => {});
+    }
+  }
+
+  function toggleAudio() {
+    const btn = document.getElementById('audio-toggle');
+    if (playing) {
+      audio.pause(); btn.textContent = '♪'; playing = false;
+    } else {
+      audio.volume = 0.6;
+      audio.play()
+        .then(() => { btn.textContent = '‖'; playing = true; })
+        .catch(() => {});
+    }
+  }
+
+
   window.addEventListener('scroll', () => {
     const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
     document.getElementById('progress-bar').style.width = pct + '%';
@@ -584,41 +626,48 @@
 
   // ── POLAROID STACK ──
   const polaroidImages = [
-    { src: './images/p1.jpg', caption: 'DiGua & Me' },
-    { src: './images/p2.jpg', caption: '2019' },
-    { src: './images/p3.jpg', caption: 'Lockdown days' },
-    { src: './images/p4.jpg', caption: 'Always here' },
-    { src: './images/p5.jpg', caption: '2024' },
+    { src: './images/p1.jpg', caption: '2018 — The beginning' },
+    { src: './images/p2.jpg', caption: '2019 — Getting used to it' },
+    { src: './images/p3.jpg', caption: '2021 — Lockdown days' },
+    { src: './images/p4.jpg', caption: '2022 — Always here' },
+    { src: './images/p5.jpg', caption: '2024 — Still together' },
   ];
 
+  let currentPolaroidSeed = 42;
+
   function buildPolaroids(seed) {
+    currentPolaroidSeed = seed;
     const stage = document.getElementById('polaroid-stage');
     stage.innerHTML = '';
     const rng = (s) => { let v = s; return () => { v = (v * 9301 + 49297) % 233280; return v / 233280; }; };
     const rand = rng(seed);
-    polaroidImages.forEach((img, i) => {
+    // Shuffle image order each time
+    const shuffled = [...polaroidImages].sort(() => rand() - 0.5);
+    shuffled.forEach((img, i) => {
       const card = document.createElement('div');
       card.className = 'polaroid-card';
       const r = rand() * 50 - 25;
-      const x = rand() * 40 - 20;
+      const x = rand() * 60 - 30;
       const y = rand() * 40 - 20;
-      const z = polaroidImages.length - i;
-      card.style.cssText = `transform: translate(${x}px,${y}px) rotate(${r}deg); z-index:${z};`;
+      const z = shuffled.length - i;
+      card.style.cssText = `transform: translate(${x}px,${y}px) rotate(${r}deg); z-index:${z}; transition: transform 0.6s cubic-bezier(0.34,1.56,0.64,1) ${i * 0.08}s, box-shadow 0.3s;`;
       card.innerHTML = `<img src="${img.src}" alt="${img.caption}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22240%22 height=%22320%22%3E%3Crect fill=%22%23333%22 width=%22100%25%22 height=%22100%25%22/%3E%3C/svg%3E'"/><div class="polaroid-caption">${img.caption}</div>`;
       stage.appendChild(card);
     });
-    stage.onclick = () => buildPolaroids(Math.floor(Math.random() * 999999));
   }
+
+  // Single persistent click handler on stage
+  document.getElementById('polaroid-stage').addEventListener('click', () => {
+    const newSeed = Math.floor(Math.random() * 999999);
+    buildPolaroids(newSeed);
+  });
+
   buildPolaroids(42);
 
-  // Animate in when in view
+  // Animate section in when in view
   const polObs = new IntersectionObserver(entries => {
     if (entries[0].isIntersecting) {
       document.getElementById('polaroid-section').classList.add('in-view');
-      const cards = document.querySelectorAll('.polaroid-card');
-      cards.forEach((c, i) => {
-        c.style.transition = `transform 0.8s cubic-bezier(0.34,1.56,0.64,1) ${i * 0.12}s, box-shadow 0.3s`;
-      });
     }
   }, { threshold: 0.2 });
   polObs.observe(document.getElementById('polaroid-section'));
@@ -630,8 +679,7 @@
   ];
   function goTo(i) { if (sections[i]) sections[i].scrollIntoView({ behavior: 'smooth' }); }
 
-  // Audio setup
-  const audio = document.getElementById('bg-audio');
+
   // Try autoplay — fires on first scroll, click, or touch
   function tryAutoplay() {
     if (playing) return;
@@ -651,30 +699,17 @@
   );
   // Also try immediately (works if user already interacted before)
   setTimeout(tryAutoplay, 500);
-  audio.volume = 0.6;
-  let playing = false;
 
-  function toggleAudio() {
-    const btn = document.getElementById('audio-toggle');
-    if (playing) {
-      audio.pause();
-      btn.textContent = '♪';
-      playing = false;
-    } else {
-      audio.play()
-        .then(() => { btn.textContent = '‖'; playing = true; })
-        .catch(err => {
-          console.warn('Audio play failed:', err);
-          btn.style.borderColor = 'rgba(212,149,106,0.5)';
-        });
-    }
-  }
 
   // Show tooltip if audio file not found
   audio.addEventListener('error', () => {
     const bar = document.getElementById('audio-bar');
     bar.title = '請將 music.mp3 放在同一資料夾';
   });
+
+  // Bind start button
+  const startBtn = document.getElementById('start-btn');
+  if (startBtn) startBtn.addEventListener('click', startStory);
 </script>
 </body>
 </html>
