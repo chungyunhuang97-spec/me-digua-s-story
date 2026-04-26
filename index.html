@@ -257,6 +257,141 @@
       .intro-title { font-size: 58px; }
       .finale-quote { font-size: 36px; }
     }
+
+    /* ── HERO TITLE ANIMATION ── */
+    .intro-title {
+      position: relative;
+    }
+    .intro-title .char {
+      display: inline-block;
+      animation: charFloat 3s ease-in-out infinite;
+      animation-delay: calc(var(--i) * 0.15s);
+    }
+    @keyframes charFloat {
+      0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 1; }
+      25% { transform: translateY(-12px) rotate(-1.5deg); }
+      75% { transform: translateY(4px) rotate(1deg); opacity: 0.85; }
+    }
+    .intro-title-outline {
+      font-family: var(--font-display);
+      font-size: clamp(72px, 14vw, 160px);
+      line-height: 0.95;
+      -webkit-text-stroke: 2px var(--cat-orange);
+      color: transparent;
+      opacity: 0;
+      animation: fadeUp 1s 0.7s forwards;
+      letter-spacing: 4px;
+    }
+    .intro-scan {
+      position: absolute;
+      left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(to right, transparent, var(--cat-orange), transparent);
+      animation: scan 4s linear infinite;
+      opacity: 0.4;
+      pointer-events: none;
+    }
+    @keyframes scan {
+      0% { top: 0%; opacity: 0; }
+      5% { opacity: 0.4; }
+      95% { opacity: 0.4; }
+      100% { top: 100%; opacity: 0; }
+    }
+
+    /* ── POLAROID FINALE ── */
+    #polaroid-section {
+      min-height: 100vh;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 40px;
+      position: relative;
+      overflow: hidden;
+      gap: 48px;
+    }
+    #polaroid-section::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at center, rgba(212,149,106,0.07) 0%, transparent 65%);
+    }
+    .polaroid-stage {
+      position: relative;
+      width: 320px;
+      height: 420px;
+    }
+    .polaroid-card {
+      position: absolute;
+      left: 50%; top: 50%;
+      width: 240px;
+      margin-left: -120px;
+      margin-top: -150px;
+      background: white;
+      padding: 12px 12px 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 4px 12px rgba(0,0,0,0.3);
+      cursor: pointer;
+      transition: box-shadow 0.3s;
+      will-change: transform;
+    }
+    .polaroid-card:hover { box-shadow: 0 28px 80px rgba(0,0,0,0.6); }
+    .polaroid-card img {
+      width: 100%;
+      aspect-ratio: 3/4;
+      object-fit: cover;
+      display: block;
+      filter: sepia(0.2) contrast(1.05) brightness(0.92);
+    }
+    .polaroid-caption {
+      margin-top: 8px;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #666;
+      text-align: center;
+      font-family: 'Courier New', monospace;
+    }
+    .polaroid-hint {
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(242,240,235,0.3);
+      text-align: center;
+      position: relative; z-index: 2;
+    }
+    .finale-text {
+      text-align: center;
+      position: relative; z-index: 2;
+      display: flex; flex-direction: column; align-items: center; gap: 20px;
+    }
+    .finale-quote-p {
+      font-family: var(--font-display);
+      font-size: clamp(36px, 5.5vw, 68px);
+      line-height: 1.15; color: var(--white);
+      max-width: 680px;
+      opacity: 0; transform: translateY(24px);
+      transition: opacity 1s 0.3s, transform 1s 0.3s;
+    }
+    .finale-zh-p {
+      font-family: var(--font-zh); font-weight: 300;
+      font-size: clamp(13px, 1.2vw, 15px);
+      color: var(--gray); letter-spacing: 4px; line-height: 2.4;
+      max-width: 460px;
+      opacity: 0; transform: translateY(16px);
+      transition: opacity 1s 0.5s, transform 1s 0.5s;
+    }
+    .finale-sig-p {
+      font-size: 10px; letter-spacing: 5px; text-transform: uppercase;
+      color: var(--cat-orange);
+      opacity: 0; transition: opacity 1s 0.7s;
+    }
+    #polaroid-section.in-view .finale-quote-p,
+    #polaroid-section.in-view .finale-zh-p { opacity: 1; transform: translateY(0); }
+    #polaroid-section.in-view .finale-sig-p { opacity: 1; }
+
+    @media (max-width: 768px) {
+      .polaroid-stage { width: 260px; height: 360px; }
+      .polaroid-card { width: 200px; margin-left: -100px; margin-top: -130px; }
+    }
   </style>
 </head>
 <body>
@@ -283,7 +418,17 @@
 <!-- INTRO -->
 <section id="intro" data-idx="0">
   <p class="intro-eyebrow">A story about a cat & a man who didn't want one</p>
-  <h1 class="intro-title">DiGua<br>& Me</h1>
+  <div class="intro-title" style="opacity:0;animation:fadeUp 1s 0.7s forwards;">
+    <div style="position:relative;">
+      <span class="intro-title-outline" style="opacity:1;animation:none;">DiGua</span>
+      <div class="intro-scan"></div>
+    </div>
+    <div style="position:relative;margin-top:-8px;">
+      <span class="char" style="font-family:var(--font-display);font-size:clamp(72px,14vw,160px);color:var(--white);--i:0">& </span>
+      <span class="char" style="font-family:var(--font-display);font-size:clamp(72px,14vw,160px);color:var(--cat-orange);--i:1">M</span>
+      <span class="char" style="font-family:var(--font-display);font-size:clamp(72px,14vw,160px);color:var(--white);--i:2">e</span>
+    </div>
+  </div>
   <p class="intro-title-zh">我 與 地 瓜</p>
   <div class="intro-scroll">Scroll</div>
 </section>
@@ -385,28 +530,19 @@
 </section>
 
 
-<!-- FINALE -->
-<section id="finale" data-idx="9">
-  <div class="film-wrap">
-    <div class="film-tape"></div>
-    <div class="film-strip">
-      <div class="film-holes">
-        <div class="hole"></div><div class="hole"></div><div class="hole"></div>
-        <div class="hole"></div><div class="hole"></div><div class="hole"></div>
-      </div>
-      <!-- 換成你與地瓜的真實合照 -->
-      <img class="film-photo" src="./images/finale.jpg" alt="我與地瓜"/>
-      <div class="film-holes bottom">
-        <div class="hole"></div><div class="hole"></div><div class="hole"></div>
-        <div class="hole"></div><div class="hole"></div><div class="hole"></div>
-      </div>
-    </div>
-    <p class="film-caption">DiGua & Me — 2018</p>
+<!-- POLAROID FINALE -->
+<section id="polaroid-section" data-idx="9">
+  <div class="polaroid-stage" id="polaroid-stage">
+    <!-- Cards injected by JS -->
   </div>
-  <p class="finale-quote">"I just want you<br>to be happy, and to stay."</p>
-  <p class="finale-quote-zh">真的很感謝有牠的存在。<br>希望能好好照顧牠、保護牠，<br>陪著牠慢慢變老。</p>
-  <p class="finale-sig">黃崇耘 & 地瓜 — 2018 to forever</p>
+  <p class="polaroid-hint">Click to shuffle</p>
+  <div class="finale-text">
+    <p class="finale-quote-p">"I just want you<br>to be happy, and to stay."</p>
+    <p class="finale-zh-p">真的很感謝有牠的存在。<br>希望能好好照顧牠、保護牠，<br>陪著牠慢慢變老。</p>
+    <p class="finale-sig-p">黃崇耘 & 地瓜 — 2018 to forever</p>
+  </div>
 </section>
+
 
 <script>
   window.addEventListener('scroll', () => {
@@ -414,7 +550,7 @@
     document.getElementById('progress-bar').style.width = pct + '%';
   });
 
-  const allScenes = document.querySelectorAll('.scene, #finale');
+  const allScenes = document.querySelectorAll('.scene, #polaroid-section');
   const dots = document.querySelectorAll('.dot');
 
   const obs = new IntersectionObserver(entries => {
@@ -440,15 +576,69 @@
   }, { threshold: 0.5 });
   introObs.observe(document.getElementById('intro'));
 
+  // ── POLAROID STACK ──
+  const polaroidImages = [
+    { src: './images/p1.jpg', caption: 'DiGua & Me' },
+    { src: './images/p2.jpg', caption: '2019' },
+    { src: './images/p3.jpg', caption: 'Lockdown days' },
+    { src: './images/p4.jpg', caption: 'Always here' },
+    { src: './images/p5.jpg', caption: '2024' },
+  ];
+
+  function buildPolaroids(seed) {
+    const stage = document.getElementById('polaroid-stage');
+    stage.innerHTML = '';
+    const rng = (s) => { let v = s; return () => { v = (v * 9301 + 49297) % 233280; return v / 233280; }; };
+    const rand = rng(seed);
+    polaroidImages.forEach((img, i) => {
+      const card = document.createElement('div');
+      card.className = 'polaroid-card';
+      const r = rand() * 50 - 25;
+      const x = rand() * 40 - 20;
+      const y = rand() * 40 - 20;
+      const z = polaroidImages.length - i;
+      card.style.cssText = `transform: translate(${x}px,${y}px) rotate(${r}deg); z-index:${z};`;
+      card.innerHTML = `<img src="${img.src}" alt="${img.caption}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22240%22 height=%22320%22%3E%3Crect fill=%22%23333%22 width=%22100%25%22 height=%22100%25%22/%3E%3C/svg%3E'"/><div class="polaroid-caption">${img.caption}</div>`;
+      stage.appendChild(card);
+    });
+    stage.onclick = () => buildPolaroids(Math.floor(Math.random() * 999999));
+  }
+  buildPolaroids(42);
+
+  // Animate in when in view
+  const polObs = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) {
+      document.getElementById('polaroid-section').classList.add('in-view');
+      const cards = document.querySelectorAll('.polaroid-card');
+      cards.forEach((c, i) => {
+        c.style.transition = `transform 0.8s cubic-bezier(0.34,1.56,0.64,1) ${i * 0.12}s, box-shadow 0.3s`;
+      });
+    }
+  }, { threshold: 0.2 });
+  polObs.observe(document.getElementById('polaroid-section'));
+
   const sections = [
     document.getElementById('intro'),
     ...document.querySelectorAll('.scene'),
-    document.getElementById('finale')
+    document.getElementById('polaroid-section')
   ];
   function goTo(i) { if (sections[i]) sections[i].scrollIntoView({ behavior: 'smooth' }); }
 
   // Audio setup
   const audio = document.getElementById('bg-audio');
+  // Try autoplay on first user interaction
+  const tryAutoplay = () => {
+    if (!playing) {
+      audio.play().then(() => {
+        document.getElementById('audio-toggle').textContent = '‖';
+        playing = true;
+      }).catch(() => {});
+    }
+    window.removeEventListener('scroll', tryAutoplay);
+    window.removeEventListener('click', tryAutoplay);
+  };
+  window.addEventListener('scroll', tryAutoplay, { once: true });
+  window.addEventListener('click', tryAutoplay, { once: true });
   audio.volume = 0.6;
   let playing = false;
 
