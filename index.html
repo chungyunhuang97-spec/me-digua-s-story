@@ -280,41 +280,43 @@
 
     /* ── POLAROID FINALE ── */
     #polaroid-section {
-      min-height: 100vh;
+      height: 100vh;
       background: var(--bg);
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-rows: 1fr auto auto auto;
       align-items: center;
-      justify-content: center;
-      padding: 60px 40px;
+      justify-items: center;
       position: relative;
       overflow: hidden;
-      gap: 48px;
     }
     #polaroid-section::before {
       content: ''; position: absolute; inset: 0;
       background: radial-gradient(ellipse at center, rgba(212,149,106,0.07) 0%, transparent 65%);
+      pointer-events: none; z-index: 0;
     }
     .polaroid-stage {
       position: relative;
-      width: 320px;
-      height: 420px;
-      margin: 0 auto;
+      width: 340px;
+      height: 400px;
+      cursor: pointer;
+      z-index: 2;
+      align-self: center;
+      justify-self: center;
     }
     .polaroid-card {
       position: absolute;
       left: 50%; top: 50%;
-      width: 240px;
-      margin-left: -120px;
-      margin-top: -150px;
+      width: 200px;
+      margin-left: -100px;
+      margin-top: -140px;
       background: white;
-      padding: 12px 12px 40px;
+      padding: 10px 10px 36px;
       box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 4px 12px rgba(0,0,0,0.3);
       cursor: pointer;
+      user-select: none;
       transition: box-shadow 0.3s;
-      will-change: transform;
     }
-    .polaroid-card:hover { box-shadow: 0 28px 80px rgba(0,0,0,0.6); }
+    .polaroid-card:hover { box-shadow: 0 28px 80px rgba(0,0,0,0.65); }
     .polaroid-card img {
       width: 100%;
       aspect-ratio: 3/4;
@@ -324,7 +326,7 @@
     }
     .polaroid-caption {
       margin-top: 8px;
-      font-size: 11px;
+      font-size: 10px;
       letter-spacing: 1.5px;
       text-transform: uppercase;
       color: #666;
@@ -335,18 +337,20 @@
       font-size: 10px;
       letter-spacing: 3px;
       text-transform: uppercase;
-      color: rgba(242,240,235,0.3);
+      color: rgba(242,240,235,0.2);
       text-align: center;
       position: relative; z-index: 2;
+      padding: 8px 0;
     }
     .finale-text {
       text-align: center;
       position: relative; z-index: 2;
-      display: flex; flex-direction: column; align-items: center; gap: 20px;
+      display: flex; flex-direction: column; align-items: center; gap: 14px;
+      padding: 0 40px 40px;
     }
     .finale-quote-p {
       font-family: var(--font-display);
-      font-size: clamp(36px, 5.5vw, 68px);
+      font-size: clamp(32px, 5vw, 60px);
       line-height: 1.15; color: var(--white);
       max-width: 680px;
       opacity: 0; transform: translateY(24px);
@@ -354,9 +358,9 @@
     }
     .finale-zh-p {
       font-family: var(--font-zh); font-weight: 300;
-      font-size: clamp(13px, 1.2vw, 15px);
-      color: var(--gray); letter-spacing: 4px; line-height: 2.4;
-      max-width: 460px;
+      font-size: clamp(12px, 1.1vw, 14px);
+      color: var(--gray); letter-spacing: 3px; line-height: 2.2;
+      max-width: 440px;
       opacity: 0; transform: translateY(16px);
       transition: opacity 1s 0.5s, transform 1s 0.5s;
     }
@@ -370,8 +374,8 @@
     #polaroid-section.in-view .finale-sig-p { opacity: 1; }
 
     @media (max-width: 768px) {
-      .polaroid-stage { width: 260px; height: 360px; }
-      .polaroid-card { width: 200px; margin-left: -100px; margin-top: -130px; }
+      .polaroid-stage { width: 280px; height: 340px; }
+      .polaroid-card { width: 170px; margin-left: -85px; margin-top: -120px; }
     }
 
     /* ── START BUTTON ── */
@@ -553,7 +557,7 @@
   <div class="polaroid-stage" id="polaroid-stage">
     <!-- Cards injected by JS -->
   </div>
-  <p class="polaroid-hint">Click to shuffle</p>
+  <p class="polaroid-hint" id="polaroid-hint">Drag to move · Click to shuffle</p>
   <div class="finale-text">
     <p class="finale-quote-p">"I just want you<br>to be happy, and to stay."</p>
     <p class="finale-zh-p">真的很感謝有牠的存在。<br>希望能好好照顧牠、保護牠，<br>陪著牠慢慢變老。</p>
@@ -633,33 +637,50 @@
     { src: './images/p5.jpg', caption: '2024 — Still together' },
   ];
 
-  let currentPolaroidSeed = 42;
+  // ── POLAROID STACK ──
+  let globalZ = 20;
+
+  function seededRand(seed) {
+    let s = seed;
+    return () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
+  }
 
   function buildPolaroids(seed) {
-    currentPolaroidSeed = seed;
     const stage = document.getElementById('polaroid-stage');
     stage.innerHTML = '';
-    const rng = (s) => { let v = s; return () => { v = (v * 9301 + 49297) % 233280; return v / 233280; }; };
-    const rand = rng(seed);
-    // Shuffle image order each time
-    const shuffled = [...polaroidImages].sort(() => rand() - 0.5);
-    shuffled.forEach((img, i) => {
+    const rand = seededRand(seed);
+
+    // Fisher-Yates shuffle
+    const arr = [...polaroidImages];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(rand() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+
+    arr.forEach((img, i) => {
       const card = document.createElement('div');
       card.className = 'polaroid-card';
-      const r = rand() * 50 - 25;
-      const x = rand() * 60 - 30;
-      const y = rand() * 40 - 20;
-      const z = shuffled.length - i;
-      card.style.cssText = `transform: translate(${x}px,${y}px) rotate(${r}deg); z-index:${z}; transition: transform 0.6s cubic-bezier(0.34,1.56,0.64,1) ${i * 0.08}s, box-shadow 0.3s;`;
-      card.innerHTML = `<img src="${img.src}" alt="${img.caption}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22240%22 height=%22320%22%3E%3Crect fill=%22%23333%22 width=%22100%25%22 height=%22100%25%22/%3E%3C/svg%3E'"/><div class="polaroid-caption">${img.caption}</div>`;
+      const r  = rand() * 50 - 25;
+      const ox = rand() * 60 - 30;
+      const oy = rand() * 40 - 20;
+      globalZ++;
+      card.style.cssText = `
+        transform: translate(${ox}px, ${oy}px) rotate(${r}deg);
+        z-index: ${arr.length - i};
+        transition: transform 0.7s cubic-bezier(0.34,1.56,0.64,1) ${i * 0.08}s, box-shadow 0.3s;
+      `;
+      card.innerHTML = `
+        <img src="${img.src}" alt="${img.caption}" draggable="false"
+          onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22260%22%3E%3Crect fill=%22%23333%22 width=%22100%25%22 height=%22100%25%22/%3E%3C/svg%3E'"/>
+        <div class="polaroid-caption">${img.caption}</div>
+      `;
       stage.appendChild(card);
     });
   }
 
-  // Single persistent click handler on stage
+  // Click anywhere on stage to shuffle
   document.getElementById('polaroid-stage').addEventListener('click', () => {
-    const newSeed = Math.floor(Math.random() * 999999);
-    buildPolaroids(newSeed);
+    buildPolaroids(Math.floor(Math.random() * 999999));
   });
 
   buildPolaroids(42);
