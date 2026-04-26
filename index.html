@@ -276,26 +276,33 @@
       font-family: var(--font-display);
       font-size: clamp(72px, 14vw, 160px);
       line-height: 0.95;
-      -webkit-text-stroke: 2px var(--cat-orange);
-      color: transparent;
-      opacity: 0;
-      animation: fadeUp 1s 0.7s forwards;
+      display: block;
       letter-spacing: 4px;
     }
-    .intro-scan {
-      position: absolute;
-      left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(to right, transparent, var(--cat-orange), transparent);
-      animation: scan 4s linear infinite;
-      opacity: 0.4;
-      pointer-events: none;
+    /* shimmer on outline text */
+    .intro-title-outline {
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(212,149,106,0.6) 40%,
+        var(--white) 50%,
+        rgba(212,149,106,0.6) 60%,
+        transparent 100%
+      );
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shimmer 4s linear infinite, fadeUp 1s 0.7s both;
     }
-    @keyframes scan {
-      0% { top: 0%; opacity: 0; }
-      5% { opacity: 0.4; }
-      95% { opacity: 0.4; }
-      100% { top: 100%; opacity: 0; }
+    @keyframes shimmer {
+      0% { background-position: 200% center; }
+      100% { background-position: -200% center; }
+    }
+    /* subtle pulse on & Me chars */
+    @keyframes charFloat {
+      0%, 100% { transform: translateY(0px); opacity: 1; }
+      50% { transform: translateY(-8px); opacity: 0.85; }
     }
 
     /* ── POLAROID FINALE ── */
@@ -421,7 +428,6 @@
   <div class="intro-title" style="opacity:0;animation:fadeUp 1s 0.7s forwards;">
     <div style="position:relative;">
       <span class="intro-title-outline" style="opacity:1;animation:none;">DiGua</span>
-      <div class="intro-scan"></div>
     </div>
     <div style="position:relative;margin-top:-8px;">
       <span class="char" style="font-family:var(--font-display);font-size:clamp(72px,14vw,160px);color:var(--white);--i:0">& </span>
@@ -626,19 +632,25 @@
 
   // Audio setup
   const audio = document.getElementById('bg-audio');
-  // Try autoplay on first user interaction
-  const tryAutoplay = () => {
-    if (!playing) {
-      audio.play().then(() => {
+  // Try autoplay — fires on first scroll, click, or touch
+  function tryAutoplay() {
+    if (playing) return;
+    audio.volume = 0.6;
+    audio.play()
+      .then(() => {
         document.getElementById('audio-toggle').textContent = '‖';
         playing = true;
-      }).catch(() => {});
-    }
-    window.removeEventListener('scroll', tryAutoplay);
-    window.removeEventListener('click', tryAutoplay);
-  };
-  window.addEventListener('scroll', tryAutoplay, { once: true });
-  window.addEventListener('click', tryAutoplay, { once: true });
+        ['scroll','click','touchstart','keydown'].forEach(ev =>
+          window.removeEventListener(ev, tryAutoplay)
+        );
+      })
+      .catch(() => {});
+  }
+  ['scroll','click','touchstart','keydown'].forEach(ev =>
+    window.addEventListener(ev, tryAutoplay, { once: false })
+  );
+  // Also try immediately (works if user already interacted before)
+  setTimeout(tryAutoplay, 500);
   audio.volume = 0.6;
   let playing = false;
 
