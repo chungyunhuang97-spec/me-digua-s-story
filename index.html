@@ -16,8 +16,8 @@
       --font-display: 'Londrina Outline', sans-serif;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; scroll-behavior: smooth; }
     body { background: var(--bg); color: var(--white); font-family: var(--font-zh); overflow-x: hidden; }
     section { display: block; }
 
@@ -159,72 +159,107 @@
     .scene.in-view .scene-text { opacity: 1; transform: translateY(0); }
     .scene.in-view .scene-divider { opacity: 1; transform: scaleX(1); }
 
-    /* ── FINALE ── */
-    #finale {
-      height: 100vh; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      padding: clamp(80px, 10vw, 140px) 40px;
-      text-align: center; position: relative;
+    /* ── POLAROID FINALE ── */
+    #polaroid-section {
+      box-sizing: border-box;
+      width: 100%;
+      min-height: 100vh;
+      background: var(--bg);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 40px;
     }
-    #finale::before {
+    #polaroid-section::before {
       content: ''; position: absolute; inset: 0;
-      background: radial-gradient(ellipse at center, rgba(212,149,106,0.08) 0%, transparent 65%);
+      background: radial-gradient(ellipse at center, rgba(212,149,106,0.07) 0%, transparent 65%);
+      pointer-events: none; z-index: 0;
     }
 
-    /* Film strip */
-    .film-wrap {
-      position: relative; margin-bottom: 60px;
-      opacity: 0; transform: translateY(48px) rotate(-2deg);
-      transition: opacity 1.2s 0.2s, transform 1.2s 0.2s;
-    }
-    #finale.in-view .film-wrap { opacity: 1; transform: translateY(0) rotate(-1.5deg); }
-
-    .film-tape {
-      position: absolute; top: -44px; left: 50%; transform: translateX(-50%);
-      width: 22px; height: 48px;
-      background: repeating-linear-gradient(to bottom, #383838 0px, #383838 7px, #252525 7px, #252525 14px);
-      border-radius: 2px 2px 0 0;
-    }
-    .film-strip {
-      background: #111; padding: 16px 12px;
-      box-shadow: 0 24px 70px rgba(0,0,0,0.75), 0 4px 14px rgba(0,0,0,0.5),
-                  inset 0 0 0 1px rgba(255,255,255,0.04);
-    }
-    .film-holes { display: flex; justify-content: space-between; padding: 0 2px; margin-bottom: 8px; }
-    .film-holes.bottom { margin-top: 8px; margin-bottom: 0; }
-    .hole { width: 14px; height: 9px; border-radius: 3px; background: var(--bg); border: 1px solid #2a2a2a; }
-
-    .film-photo {
-      width: clamp(240px, 38vw, 380px);
-      aspect-ratio: 4/3; object-fit: cover; display: block;
-      filter: sepia(0.3) contrast(1.08) brightness(0.88);
-    }
-    .film-caption {
-      text-align: center; margin-top: 10px;
-      font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--gray);
+    .polaroid-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 600px;
     }
 
-    .finale-quote {
+    .polaroid-stage {
+      position: relative;
+      width: 300px;
+      height: 340px;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .polaroid-card {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 180px;
+      background: white;
+      padding: 10px 10px 34px;
+      box-shadow: 0 16px 50px rgba(0,0,0,0.5), 0 3px 10px rgba(0,0,0,0.3);
+      cursor: pointer;
+      user-select: none;
+    }
+    .polaroid-card:hover { box-shadow: 0 24px 70px rgba(0,0,0,0.65); }
+    .polaroid-card img {
+      width: 100%;
+      aspect-ratio: 3/4;
+      object-fit: cover;
+      display: block;
+      filter: sepia(0.2) contrast(1.05) brightness(0.92);
+    }
+    .polaroid-caption {
+      margin-top: 6px;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #666;
+      text-align: center;
+      font-family: 'Courier New', monospace;
+    }
+    .polaroid-hint {
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(242,240,235,0.22);
+      text-align: center;
+    }
+
+    .finale-text {
+      text-align: center;
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+    }
+    .finale-quote-p {
       font-family: var(--font-display);
-      font-size: clamp(38px, 6vw, 76px);
-      line-height: 1.15; color: var(--white); max-width: 700px; margin-bottom: 28px;
+      font-size: clamp(30px, 4vw, 54px);
+      line-height: 1.15; color: var(--white);
+      max-width: 700px;
       opacity: 0; transform: translateY(24px);
+      transition: opacity 1s 0.3s, transform 1s 0.3s;
+    }
+    .finale-zh-p {
+      font-family: var(--font-zh); font-weight: 300;
+      font-size: clamp(12px, 1.1vw, 14px);
+      color: var(--gray); letter-spacing: 3px; line-height: 2;
+      max-width: 440px;
+      opacity: 0; transform: translateY(16px);
       transition: opacity 1s 0.5s, transform 1s 0.5s;
     }
-    .finale-quote-zh {
-      font-family: var(--font-zh); font-weight: 300;
-      font-size: clamp(13px, 1.3vw, 16px); color: var(--gray);
-      letter-spacing: 4px; line-height: 2.4; max-width: 480px; margin-bottom: 48px;
-      opacity: 0; transform: translateY(16px);
-      transition: opacity 1s 0.7s, transform 1s 0.7s;
-    }
-    .finale-sig {
+    .finale-sig-p {
       font-size: 10px; letter-spacing: 5px; text-transform: uppercase;
-      color: var(--cat-orange); opacity: 0; transition: opacity 1s 0.9s;
+      color: var(--cat-orange);
+      opacity: 0; transition: opacity 1s 0.7s;
     }
-    #finale.in-view .finale-quote,
-    #finale.in-view .finale-quote-zh { opacity: 1; transform: translateY(0); }
-    #finale.in-view .finale-sig { opacity: 1; }
+    #polaroid-section.in-view .finale-quote-p,
+    #polaroid-section.in-view .finale-zh-p { opacity: 1; transform: translateY(0); }
+    #polaroid-section.in-view .finale-sig-p { opacity: 1; }
 
     /* ── KEYFRAMES ── */
     @keyframes fadeUp {
@@ -243,29 +278,20 @@
       .scene-body { padding: 40px 28px 56px; max-width: 100%; }
       .scene-text { max-width: 100%; }
       #chapter-dots { display: none; }
-      .film-photo { width: 72vw; }
+      .polaroid-stage { width: 240px; height: 280px; }
+      .polaroid-card { width: 150px; }
+      .polaroid-wrapper { gap: 24px; }
+      #polaroid-section { padding: 40px 24px; }
     }
+
     @media (max-width: 480px) {
       .intro-title { font-size: 58px; }
-      .finale-quote { font-size: 36px; }
+      .finale-quote-p { font-size: 30px; }
     }
 
-    /* ── HERO TITLE ANIMATION ── */
+    /* ── INTRO TITLE ── */
     .intro-title {
       position: relative;
-    }
-
-    @keyframes charFloat {
-      0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 1; }
-      25% { transform: translateY(-12px) rotate(-1.5deg); }
-      75% { transform: translateY(4px) rotate(1deg); opacity: 0.85; }
-    }
-    .intro-title-outline {
-      font-family: var(--font-display);
-      font-size: clamp(72px, 14vw, 160px);
-      line-height: 0.95;
-      display: block;
-      letter-spacing: 4px;
     }
     .intro-title-outline {
       font-family: var(--font-display);
@@ -274,108 +300,6 @@
       display: block;
       letter-spacing: 4px;
       color: var(--white);
-    }
-      50% { transform: translateY(-8px); opacity: 0.85; }
-    }
-
-    /* ── POLAROID FINALE ── */
-    #polaroid-section {
-      height: 100vh;
-      background: var(--bg);
-      display: grid;
-      grid-template-rows: 1fr auto auto auto;
-      align-items: center;
-      justify-items: center;
-      position: relative;
-      overflow: hidden;
-    }
-    #polaroid-section::before {
-      content: ''; position: absolute; inset: 0;
-      background: radial-gradient(ellipse at center, rgba(212,149,106,0.07) 0%, transparent 65%);
-      pointer-events: none; z-index: 0;
-    }
-    .polaroid-stage {
-      position: relative;
-      width: 340px;
-      height: 400px;
-      cursor: pointer;
-      z-index: 2;
-      align-self: center;
-      justify-self: center;
-    }
-    .polaroid-card {
-      position: absolute;
-      left: 50%; top: 50%;
-      width: 200px;
-      margin-left: -100px;
-      margin-top: -140px;
-      background: white;
-      padding: 10px 10px 36px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 4px 12px rgba(0,0,0,0.3);
-      cursor: pointer;
-      user-select: none;
-      transition: box-shadow 0.3s;
-    }
-    .polaroid-card:hover { box-shadow: 0 28px 80px rgba(0,0,0,0.65); }
-    .polaroid-card img {
-      width: 100%;
-      aspect-ratio: 3/4;
-      object-fit: cover;
-      display: block;
-      filter: sepia(0.2) contrast(1.05) brightness(0.92);
-    }
-    .polaroid-caption {
-      margin-top: 8px;
-      font-size: 10px;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: #666;
-      text-align: center;
-      font-family: 'Courier New', monospace;
-    }
-    .polaroid-hint {
-      font-size: 10px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: rgba(242,240,235,0.2);
-      text-align: center;
-      position: relative; z-index: 2;
-      padding: 8px 0;
-    }
-    .finale-text {
-      text-align: center;
-      position: relative; z-index: 2;
-      display: flex; flex-direction: column; align-items: center; gap: 14px;
-      padding: 0 40px 40px;
-    }
-    .finale-quote-p {
-      font-family: var(--font-display);
-      font-size: clamp(32px, 5vw, 60px);
-      line-height: 1.15; color: var(--white);
-      max-width: 680px;
-      opacity: 0; transform: translateY(24px);
-      transition: opacity 1s 0.3s, transform 1s 0.3s;
-    }
-    .finale-zh-p {
-      font-family: var(--font-zh); font-weight: 300;
-      font-size: clamp(12px, 1.1vw, 14px);
-      color: var(--gray); letter-spacing: 3px; line-height: 2.2;
-      max-width: 440px;
-      opacity: 0; transform: translateY(16px);
-      transition: opacity 1s 0.5s, transform 1s 0.5s;
-    }
-    .finale-sig-p {
-      font-size: 10px; letter-spacing: 5px; text-transform: uppercase;
-      color: var(--cat-orange);
-      opacity: 0; transition: opacity 1s 0.7s;
-    }
-    #polaroid-section.in-view .finale-quote-p,
-    #polaroid-section.in-view .finale-zh-p { opacity: 1; transform: translateY(0); }
-    #polaroid-section.in-view .finale-sig-p { opacity: 1; }
-
-    @media (max-width: 768px) {
-      .polaroid-stage { width: 280px; height: 340px; }
-      .polaroid-card { width: 170px; margin-left: -85px; margin-top: -120px; }
     }
 
     /* ── START BUTTON ── */
@@ -397,7 +321,6 @@
       opacity: 0;
       animation: fadeUp 1s 1.2s forwards;
       transition: background 0.3s, border-color 0.3s, transform 0.2s;
-      position: relative;
       overflow: hidden;
     }
     .start-btn::before {
@@ -419,7 +342,6 @@
       0%, 100% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.6; transform: scale(1.3); }
     }
-    /* remove old scroll indicator */
     .intro-scroll { display: none; }
   </style>
 </head>
@@ -554,19 +476,22 @@
 
 <!-- POLAROID FINALE -->
 <section id="polaroid-section" data-idx="9">
-  <div class="polaroid-stage" id="polaroid-stage">
-    <!-- Cards injected by JS -->
-  </div>
-  <p class="polaroid-hint" id="polaroid-hint">Drag to move · Click to shuffle</p>
-  <div class="finale-text">
-    <p class="finale-quote-p">"I just want you<br>to be happy, and to stay."</p>
-    <p class="finale-zh-p">真的很感謝有牠的存在。<br>希望能好好照顧牠、保護牠，<br>陪著牠慢慢變老。</p>
-    <p class="finale-sig-p">黃崇耘 & 地瓜 — 2018 to forever</p>
+  <div class="polaroid-wrapper">
+    <div class="polaroid-stage" id="polaroid-stage">
+      <!-- Cards injected by JS -->
+    </div>
+    <p class="polaroid-hint">Click to shuffle</p>
+    <div class="finale-text">
+      <p class="finale-quote-p">"I just want you<br>to be happy, and to stay."</p>
+      <p class="finale-zh-p">真的很感謝有牠的存在。<br>希望能好好照顧牠、保護牠，<br>陪著牠慢慢變老。</p>
+      <p class="finale-sig-p">黃崇耘 & 地瓜 — 2018 to forever</p>
+    </div>
   </div>
 </section>
 
 
-<script>  // ── GLOBALS (must be at top for onclick handlers) ──
+<script>
+  // ── GLOBALS ──
   const audio = document.getElementById('bg-audio');
   let playing = false;
 
@@ -596,6 +521,15 @@
     }
   }
 
+  // ── SET HEIGHTS — 只針對 #intro 和 .scene，不動 #polaroid-section ──
+  function setHeights() {
+    const h = window.innerHeight;
+    document.querySelectorAll('#intro, .scene').forEach(el => {
+      el.style.height = h + 'px';
+    });
+  }
+  setHeights();
+  window.addEventListener('resize', setHeights);
 
   window.addEventListener('scroll', () => {
     const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
@@ -637,7 +571,6 @@
     { src: './images/p5.jpg', caption: '2024 — Still together' },
   ];
 
-  // ── POLAROID STACK ──
   let globalZ = 20;
 
   function seededRand(seed) {
@@ -650,7 +583,6 @@
     stage.innerHTML = '';
     const rand = seededRand(seed);
 
-    // Fisher-Yates shuffle
     const arr = [...polaroidImages];
     for (let i = arr.length - 1; i > 0; i--) {
       const j = Math.floor(rand() * (i + 1));
@@ -664,11 +596,9 @@
       const ox = rand() * 60 - 30;
       const oy = rand() * 40 - 20;
       globalZ++;
-      card.style.cssText = `
-        transform: translate(${ox}px, ${oy}px) rotate(${r}deg);
-        z-index: ${arr.length - i};
-        transition: transform 0.7s cubic-bezier(0.34,1.56,0.64,1) ${i * 0.08}s, box-shadow 0.3s;
-      `;
+      card.style.transform = `translate(calc(-50% + ${ox}px), calc(-50% + ${oy}px)) rotate(${r}deg)`;
+      card.style.zIndex = arr.length - i;
+      card.style.transition = `transform 0.7s cubic-bezier(0.34,1.56,0.64,1) ${i * 0.08}s, box-shadow 0.3s`;
       card.innerHTML = `
         <img src="${img.src}" alt="${img.caption}" draggable="false"
           onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22260%22%3E%3Crect fill=%22%23333%22 width=%22100%25%22 height=%22100%25%22/%3E%3C/svg%3E'"/>
@@ -678,14 +608,12 @@
     });
   }
 
-  // Click anywhere on stage to shuffle
   document.getElementById('polaroid-stage').addEventListener('click', () => {
     buildPolaroids(Math.floor(Math.random() * 999999));
   });
 
   buildPolaroids(42);
 
-  // Animate section in when in view
   const polObs = new IntersectionObserver(entries => {
     if (entries[0].isIntersecting) {
       document.getElementById('polaroid-section').classList.add('in-view');
@@ -700,8 +628,6 @@
   ];
   function goTo(i) { if (sections[i]) sections[i].scrollIntoView({ behavior: 'smooth' }); }
 
-
-  // Try autoplay — fires on first scroll, click, or touch
   function tryAutoplay() {
     if (playing) return;
     audio.volume = 0.6;
@@ -718,17 +644,13 @@
   ['scroll','click','touchstart','keydown'].forEach(ev =>
     window.addEventListener(ev, tryAutoplay, { once: false })
   );
-  // Also try immediately (works if user already interacted before)
   setTimeout(tryAutoplay, 500);
 
-
-  // Show tooltip if audio file not found
   audio.addEventListener('error', () => {
     const bar = document.getElementById('audio-bar');
     bar.title = '請將 music.mp3 放在同一資料夾';
   });
 
-  // Bind start button
   const startBtn = document.getElementById('start-btn');
   if (startBtn) startBtn.addEventListener('click', startStory);
 </script>
